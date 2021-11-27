@@ -1,4 +1,4 @@
-package handler
+package product
 
 import (
 	"database/sql"
@@ -12,16 +12,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Handler struct {
+type handler struct {
 	DB   *sql.DB
 	Tmpl *template.Template
 }
 
-func NewHandler(db *sql.DB, tmpl *template.Template) *Handler {
-	return &Handler{DB: db, Tmpl: tmpl}
+func NewHandler(db *sql.DB, tmpl *template.Template) *handler {
+	return &handler{DB: db, Tmpl: tmpl}
 }
 
-func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
+func (h *handler) List(w http.ResponseWriter, r *http.Request) {
 	products := []*model.Product{}
 
 	rows, err := h.DB.Query("SELECT * FROM products")
@@ -52,7 +52,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) AddForm(w http.ResponseWriter, r *http.Request) {
+func (h *handler) AddForm(w http.ResponseWriter, r *http.Request) {
 	err := h.Tmpl.ExecuteTemplate(w, "create.html", nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -60,7 +60,7 @@ func (h *Handler) AddForm(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) Add(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Add(w http.ResponseWriter, r *http.Request) {
 	price, err := strconv.Atoi(r.FormValue("price"))
 	if err != nil {
 		log.Println(err)
@@ -79,7 +79,7 @@ func (h *Handler) Add(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func (h *Handler) Edit(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Edit(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, err := strconv.Atoi(vars["id"])
@@ -103,7 +103,7 @@ func (h *Handler) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -125,7 +125,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {

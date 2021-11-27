@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	handler "postgres/handler/product"
+	"postgres/handler/product"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -41,17 +41,11 @@ func (a *App) CloseDb() {
 }
 
 func (a *App) Run(port string) error {
-	handlers := handler.NewHandler(a.db, template.Must(template.ParseGlob("../web/*")))
+	handlers := product.NewHandler(a.db, template.Must(template.ParseGlob("../web/*")))
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", handlers.List).Methods("GET")
-	r.HandleFunc("/products", handlers.List).Methods("GET")
-	r.HandleFunc("/products/new", handlers.AddForm).Methods("GET")
-	r.HandleFunc("/products/new", handlers.Add).Methods("POST")
-	r.HandleFunc("/products/{id}", handlers.Edit).Methods("GET")
-	r.HandleFunc("/products/{id}", handlers.Update).Methods("POST")
-	r.HandleFunc("/products/{id}", handlers.Delete).Methods("DELETE")
+	handlers.Register(r)
 
 	a.httpServer = &http.Server{
 		Addr:    port,
