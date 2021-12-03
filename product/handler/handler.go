@@ -24,6 +24,8 @@ func NewHandler(useCase product.UseCase, tmpl *template.Template) *Handler {
 	}
 }
 
+// TODO handle errors
+
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	products, err := h.useCase.GetProducts()
 	if err != nil {

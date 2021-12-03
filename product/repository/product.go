@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/Ratatoouille/model"
 	_ "github.com/lib/pq"
@@ -11,6 +10,8 @@ import (
 type ProductRepository struct {
 	db *sql.DB
 }
+
+// TODO change pq to pgx
 
 func NewProductRepository(db *sql.DB) *ProductRepository {
 	return &ProductRepository{
@@ -37,7 +38,7 @@ func (r ProductRepository) GetProducts() ([]*model.Product, error) {
 
 	rows, err := r.db.Query("SELECT * FROM products")
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
 	for rows.Next() {
@@ -45,7 +46,7 @@ func (r ProductRepository) GetProducts() ([]*model.Product, error) {
 
 		err = rows.Scan(&product.Id, &product.Model, &product.Company, &product.Price)
 		if err != nil {
-			log.Println(err)
+			return nil, err
 		}
 
 		products = append(products, product)
