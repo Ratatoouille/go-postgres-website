@@ -5,8 +5,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"postgres/model"
 	"strconv"
+
+	"github.com/Ratatoouille/model"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"postgres/server"
+	"github.com/Ratatoouille/internal/server"
 )
 
 func main() {

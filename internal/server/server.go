@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"postgres/handler/product"
 	"time"
+
+	"github.com/Ratatoouille/handler/product"
 
 	"github.com/gorilla/mux"
 )

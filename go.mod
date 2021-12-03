@@ -1,4 +1,4 @@
-module postgres
+module github.com/Ratatoouille
 
 go 1.17
 
