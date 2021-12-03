@@ -10,20 +10,28 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Ratatoouille/handler/product"
+	"github.com/Ratatoouille/product"
+	"github.com/Ratatoouille/product/handler"
+	"github.com/Ratatoouille/product/repository"
+	"github.com/Ratatoouille/product/usecase"
 
 	"github.com/gorilla/mux"
 )
 
 type App struct {
 	httpServer *http.Server
-	db         *sql.DB
+
+	productUC product.UseCase
 }
 
 func NewApp() *App {
 	db := initDB()
 
-	return &App{db: db}
+	productRepo := repository.NewProductRepository(db)
+
+	return &App{
+		productUC: usecase.NewProductUseCase(productRepo),
+	}
 }
 
 func initDB() *sql.DB {
@@ -37,16 +45,13 @@ func initDB() *sql.DB {
 	return db
 }
 
-func (a *App) CloseDb() {
-	a.db.Close()
-}
-
 func (a *App) Run(port string) error {
-	handlers := product.NewHandler(a.db, template.Must(template.ParseGlob("../web/*")))
-
 	r := mux.NewRouter()
 
-	handlers.Register(r)
+	handler.RegisterHTTPEndpoints(
+		r, a.productUC,
+		template.Must(template.ParseGlob("./web/*")),
+	)
 
 	a.httpServer = &http.Server{
 		Addr:    port,

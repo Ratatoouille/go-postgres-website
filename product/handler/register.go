@@ -1,8 +1,15 @@
-package product
+package handler
 
-import "github.com/gorilla/mux"
+import (
+	"html/template"
 
-func (h handler) Register(r *mux.Router) {
+	"github.com/Ratatoouille/product"
+	"github.com/gorilla/mux"
+)
+
+func RegisterHTTPEndpoints(r *mux.Router, u product.UseCase, tmpl *template.Template) {
+	h := NewHandler(u, tmpl)
+
 	r.HandleFunc("/", h.List).Methods("GET")
 	r.HandleFunc("/products", h.List).Methods("GET")
 	r.HandleFunc("/products/new", h.AddForm).Methods("GET")
