@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"github.com/Ratatoouille/product/handler"
 	"github.com/Ratatoouille/product/repository"
 	"github.com/Ratatoouille/product/usecase"
+	"github.com/jackc/pgx/v4"
 
 	"github.com/gorilla/mux"
 )
@@ -34,15 +34,14 @@ func NewApp() *App {
 	}
 }
 
-func initDB() *sql.DB {
-	connStr := "user=postgres password=mypass dbname=product sslmode=disable"
-
-	db, err := sql.Open("postgres", connStr)
+func initDB() *pgx.Conn {
+	conn, err := pgx.Connect(context.Background(), "postgres://postgres:mypass@localhost:5432/product")
 	if err != nil {
 		log.Panicln(err)
+		os.Exit(1)
 	}
 
-	return db
+	return conn
 }
 
 func (a *App) Run(port string) error {

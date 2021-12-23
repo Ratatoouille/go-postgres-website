@@ -1,19 +1,17 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 
 	"github.com/Ratatoouille/model"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
 )
 
 type ProductRepository struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
-// TODO change pq to pgx
-
-func NewProductRepository(db *sql.DB) *ProductRepository {
+func NewProductRepository(db *pgx.Conn) *ProductRepository {
 	return &ProductRepository{
 		db: db,
 	}
@@ -21,6 +19,7 @@ func NewProductRepository(db *sql.DB) *ProductRepository {
 
 func (r ProductRepository) CreateProduct(product *model.Product) error {
 	_, err := r.db.Exec(
+		context.Background(),
 		"INSERT INTO products (model, company, price) VALUES ($1, $2, $3)",
 		product.Model,
 		product.Company,
@@ -36,7 +35,7 @@ func (r ProductRepository) CreateProduct(product *model.Product) error {
 func (r ProductRepository) GetProducts() ([]*model.Product, error) {
 	var products []*model.Product
 
-	rows, err := r.db.Query("SELECT * FROM products")
+	rows, err := r.db.Query(context.Background(), "SELECT * FROM products")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +56,10 @@ func (r ProductRepository) GetProducts() ([]*model.Product, error) {
 }
 
 func (r ProductRepository) EditProduct(product *model.Product, id int) error {
-	row := r.db.QueryRow("SELECT id, model, company, price  FROM products WHERE id = $1", id)
+	row := r.db.QueryRow(
+		context.Background(),
+		"SELECT id, model, company, price  FROM products WHERE id = $1", id,
+	)
 
 	err := row.Scan(&product.Id, &product.Model, &product.Company, &product.Price)
 	if err != nil {
@@ -69,6 +71,7 @@ func (r ProductRepository) EditProduct(product *model.Product, id int) error {
 
 func (r ProductRepository) UpdateProduct(product *model.Product) error {
 	_, err := r.db.Exec(
+		context.Background(),
 		"UPDATE products SET model = $1, company = $2, price = $3 WHERE id = $4",
 		product.Model,
 		product.Company,
@@ -84,6 +87,7 @@ func (r ProductRepository) UpdateProduct(product *model.Product) error {
 
 func (r ProductRepository) DeleteProduct(id int) error {
 	_, err := r.db.Exec(
+		context.Background(),
 		"DELETE FROM products WHERE id = $1",
 		id,
 	)
